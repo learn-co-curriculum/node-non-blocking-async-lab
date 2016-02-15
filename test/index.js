@@ -1,26 +1,36 @@
-var expect = require('chai').expect,
-  cp = require('child_process')
+var expect = require('chai').expect
+var fs = require('fs')
+var path = require('path')
 
-
-describe('node version', function () {
-  it('must be 5.1', function(done){
-    expect(process.versions.node).to.equal('5.1.0')
-    done()
-  })
-
-})
-
-describe('npm version', function () {
-  it('must be 2.14.15 or greater', function(done){
-    child = cp.exec('npm -v',
-    function (error, stdout, stderr) {
-      expect(stderr).to.equal('')
-      if (error !== null) {
-        console.log('exec error: ' + error)
-      }
-      stdout = stdout.replace('\n','')
-      // expect(semver.satisfies(stdout, '>=2.14.15')).to.equal(true)
+describe('mask.js', function () {
+  it('must work', function(done){
+    var mask = require(path.join(__dirname, '../mask'))
+    mask(function(error, maskedData){
+      expect(error).to.be.null
+      var maskedTestData = fs.readFileSync('./test/customers.json', 'utf8')
+      expect(maskedData).to.equal(maskedTestData)
       done()
     })
+  })
+  it('must have readFile ', function(done){
+    var mask = fs.readFileSync(path.join(__dirname, '../mask.js'), 'utf8')
+    expect(mask).to.contain('readFile')
+    done()
+  })
+  it('must have writeFile ', function(done){
+    var mask = fs.readFileSync(path.join(__dirname, '../mask.js'), 'utf8')
+    expect(mask).to.contain('writeFile')
+    done()
+  })
+  it('must create customers.json', function(done){
+    var stats
+    try {
+       stats = fs.statSync(path.join(__dirname, '../customers.json'))
+    } catch(e){
+      expect(e).to.be.null
+    }
+    expect(stats).to.not.be.undefined
+    expect(stats.isFile()).to.equal(true)
+    done()
   })
 })
