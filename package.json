@@ -1,0 +1,24 @@
+{
+  "name": "node-non-blocking-async-lab",
+  "version": "1.0.0",
+  "description": "Async File Read and Write",
+  "main": "index.js",
+  "scripts": {
+    "test": "node_modules/mocha/bin/mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:learn-co-curriculum/node-non-blocking-async-lab.git"
+  },
+  "author": "Azat Mardan",
+  "license": "ISC",
+  "bugs": {
+    "url": "git@github.com:learn-co-curriculum/node-non-blocking-async-lab.git/issues"
+  },
+  "homepage": "git@github.com:learn-co-curriculum/node-non-blocking-async-lab.git/#readme",
+  "devDependencies": {
+    "chai": "3.5.0",
+    "chai-spies": "^0.7.1",
+    "mocha": "2.4.5"
+  }
+}
