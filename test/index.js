@@ -1,8 +1,13 @@
-var expect = require('chai').expect
+var chaiSpies = require('chai-spies')
+var chai = require('chai')
 var fs = require('fs')
 var path = require('path')
 
-describe('mask.js', function () {
+chai.use(chaiSpies)
+
+var expect = chai.expect
+
+describe('mask.js', function() {
   it('must work', function(done){
     var mask = require(path.join(__dirname, '../mask'))
     mask(function(error, maskedData){
@@ -12,25 +17,53 @@ describe('mask.js', function () {
       done()
     })
   })
-  it('must have readFile ', function(done){
-    var mask = fs.readFileSync(path.join(__dirname, '../mask.js'), 'utf8')
-    expect(mask).to.contain('readFile')
-    done()
+
+  it('uses fs.readFile ', function(done) {
+    var spy = chai.spy.on(fs, 'readFile')
+    var mask = require(path.join(__dirname, '..', 'mask'))
+
+    mask(function(error, data) {
+      expect(spy).to.have.been.called.once
+      fs.readFile.reset()
+      done()
+    })
   })
-  it('must have writeFile ', function(done){
-    var mask = fs.readFileSync(path.join(__dirname, '../mask.js'), 'utf8')
-    expect(mask).to.contain('writeFile')
-    done()
+
+  it('uses fs.writeFile ', function(done) {
+    var spy = chai.spy.on(fs, 'writeFile')
+    var mask = require(path.join(__dirname, '..', 'mask'))
+
+    mask(function(error, data) {
+      expect(spy).to.have.been.called.once
+      fs.writeFile.reset()
+      done()
+    })
   })
-  it('must create customers.json', function(done){
-    var stats
+
+  it('creates customers.json', function(done) {
+    var customersLocation = path.join(__dirname, '..', 'customers.json')
+
     try {
-       stats = fs.statSync(path.join(__dirname, '../customers.json'))
-    } catch(e){
-      expect(e).to.be.null
+      fs.unlinkSync(customersLocation)
+    } catch (e) {
+      // swallow errors -- we just want
+      // to make sure that the file
+      // doesn't exist
     }
-    expect(stats).to.not.be.undefined
-    expect(stats.isFile()).to.equal(true)
-    done()
+
+    var mask = require(path.join(__dirname, '..', 'mask'))
+
+    mask(function(error, results) {
+      var stats
+      try {
+        stats = fs.statSync(customersLocation)
+      } catch(e){
+        expect(e).to.be.null
+      }
+
+      expect(stats).to.not.be.undefined
+      expect(stats.isFile()).to.equal(true)
+      done()
+    })
   })
 })
